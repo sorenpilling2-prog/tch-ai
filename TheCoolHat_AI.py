@@ -8,12 +8,8 @@ Original file is located at
 """
 
 import streamlit as st
-# FIXED: Using the new official Google GenAI standard library
 from google import genai
 from google.genai import types
-
-# Securely pulls your active key from your Streamlit Secrets vault
-GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 
 # Your custom developer backstory and friendly personality matrix
 AI_PERSONALITY = (
@@ -43,8 +39,8 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
     # Simple generation loop that cannot trigger an attribute crash
     with st.chat_message("assistant"):
         try:
-            # Initialize the modernized Google AI client mapping using the secrets key
-            client = genai.Client(api_key=GOOGLE_API_KEY)
+            # FIXED: Passing your key directly inside the constructor to bypass variable name loops
+            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
             
             # Reconstruct the text history cleanly into the prompt stream
             conversation_history = ""
@@ -69,5 +65,6 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
             
         except Exception as e:
             st.error("System connection failure. Check your Google AI Studio project settings.")
+
 
 
