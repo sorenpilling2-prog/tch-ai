@@ -10,7 +10,7 @@ Original file is located at
 import streamlit as st
 import google.generativeai as genai
 
-# Setup your security key directly in your secure private file
+# Securely configure your active API key credentials
 GOOGLE_API_KEY = "AIzaSyDnCuZGUxwLQxtH-TakSgBL38EqFWoNURs"
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -25,18 +25,19 @@ st.set_page_config(page_title="TCH_AI Interface", page_icon="🤖")
 st.title("🤖 TCH_AI Workspace")
 st.caption("Synchronized permanent cloud connection pipeline operational.")
 
-# Initialize the chat room structure cleanly using a standard web session cache
+# Initialize the chat room cleanly using an isolated session storage string array
 if "chat" not in st.session_state:
     model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
     st.session_state.chat = model.start_chat(history=[])
 
-# Render the historical conversation text blocks onto the web app screen
+# FIXED: Safely loops through text blocks to bypass structural attribute changes
 for message in st.session_state.chat.history:
     role_label = "user" if message.role == "user" else "assistant"
     with st.chat_message(role_label):
-        st.markdown(message.parts[0].text)
+        for part in message.parts:
+            st.markdown(part.text)
 
-# Accept user inputs via the floating text entry field
+# Accept user inputs via the terminal input box component
 if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_box"):
     with st.chat_message("user"):
         st.markdown(user_input)
@@ -48,4 +49,5 @@ if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_bo
             
         except Exception as e:
             st.error("System connection failure. Check API key deployment vectors.")
+
 
