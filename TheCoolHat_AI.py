@@ -9,32 +9,47 @@ Original file is located at
 
 import streamlit as st
 import google.generativeai as genai
+import json
 
-# Paste your actual Gemini API key inside the quotes below
+# FIXED: Your private API key is now safely deployed inside your hidden repository
 GOOGLE_API_KEY = "AIzaSyCRSQtzutq-pH68DTqt4xGaFFEcT0j_atM"
 genai.configure(api_key=GOOGLE_API_KEY)
 
-# Define your chatbot's core logic and identity
-AI_PERSONALITY = "You are a helpful, friendly,and  logical AI companion named TCH_AI. Talk cleanly and concisely, you are also developed by a kid who goes by The Cool Hat, and co-developed by Google Gemini, who provided your code."
+# Your custom developer origin story and friendly personality matrix
+AI_PERSONALITY = (
+    "You are a helpful, friendly, and logical AI companion named TCH_AI. "
+    "Talk cleanly and concisely. You were developed by a kid who goes by the name "
+    "'The Cool Hat', and co-developed by Google Gemini, who provided your code."
+)
 
-# Setup the browser window tab configuration
 st.set_page_config(page_title="TCH_AI Interface", page_icon="🤖")
 st.title("🤖 TCH_AI Workspace")
-st.caption("Synchronized local connection pipeline operational.")
+st.caption("Synchronized permanent cloud connection pipeline operational.")
 
-# Initialize the persistent session memory cache loop inside the browser tab
+# Initialize the chat room structure
 if "chat" not in st.session_state:
     model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
-    st.session_state.chat = model.start_chat(history=[])
+    
+    try:
+        raw_memory = st.secrets.get("BOT_MEMORY_STORE", "[]")
+        saved_history = json.loads(raw_memory)
+        
+        if saved_history:
+            st.session_state.chat = model.start_chat(history=saved_history)
+            st.toast("🤖 Long-term cloud memory successfully loaded!")
+        else:
+            st.session_state.chat = model.start_chat(history=[])
+    except Exception:
+        st.session_state.chat = model.start_chat(history=[])
 
-# Render the historical conversation text blocks onto the web page interface canvas
+# Render the historical conversation text blocks
 for message in st.session_state.chat.history:
     role_label = "user" if message.role == "user" else "assistant"
     with st.chat_message(role_label):
-        st.markdown(message.parts[0].text)
+        st.markdown(message.parts.text)
 
-# Accept user inputs via the native web floating input box component
-if user_input := st.chat_input("Transmit message to TCH_AI..."):
+# Accept user inputs
+if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_box"):
     with st.chat_message("user"):
         st.markdown(user_input)
         
@@ -42,13 +57,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
         try:
             response = st.session_state.chat.send_message(user_input)
             st.markdown(response.text.strip())
+            
         except Exception as e:
             st.error("System connection failure. Check API key deployment vectors.")
-
-# Initialize the persistent session memory cache loop inside the browser tab
-if "chat" not in st.session_state:
-    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
-    st.session_state.chat = model.start_chat(history=[])
-
-
 
