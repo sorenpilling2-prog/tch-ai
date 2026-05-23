@@ -31,7 +31,7 @@ if "chat" not in st.session_state:
 for message in st.session_state.chat.history:
     role_label = "user" if message.role == "user" else "assistant"
     with st.chat_message(role_label):
-        st.markdown(message.parts.text)
+        st.markdown(message.text)
 
 # Accept user inputs via the native web floating input box component
 if user_input := st.chat_input("Transmit message to TCH_AI..."):
