@@ -8,11 +8,7 @@ Original file is located at
 """
 
 import streamlit as st
-import google.generativeai as genai
-
-# Configure your active API key credentials securely
-GOOGLE_API_KEY = "AIzaSyDnCuZGUxwLQxtH-TakSgBL38EqFWoNURs"
-genai.configure(api_key=GOOGLE_API_KEY)
+import requests
 
 # Your custom developer origin story and friendly personality matrix
 AI_PERSONALITY = (
@@ -23,45 +19,48 @@ AI_PERSONALITY = (
 
 st.set_page_config(page_title="TCH_AI Interface", page_icon="🤖")
 st.title("🤖 TCH_AI Workspace")
-st.caption("Synchronized permanent cloud connection pipeline operational.")
+st.caption("Synchronized permanent connection pipeline operational.")
 
-# Initialize the model engine brain
-if "model" not in st.session_state:
-    st.session_state.model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
-
-# FIXED: We use a standard Python list to store chat history, bypassing the 'RepeatedComposite' bug completely!
+# Initialize the messaging memory list array cleanly
 if "messages_log" not in st.session_state:
     st.session_state.messages_log = []
 
-# Render the historical conversation text blocks onto the web screen layout canvas
+# Render the historical conversation text blocks onto the web app screen
 for message in st.session_state.messages_log:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # Accept user inputs via the terminal input box component
 if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_box"):
-    # Display and log the user's input
     with st.chat_message("user"):
         st.markdown(user_input)
     st.session_state.messages_log.append({"role": "user", "content": user_input})
         
-    # Query the Google cloud server and stream the clean text response
     with st.chat_message("assistant"):
         try:
-            # We reconstruct the conversation history in a clean text format for the model
-            conversation_history = f"System: {AI_PERSONALITY}\n"
-            for msg in st.session_state.messages_log[:-1]:
-                prefix = "User: " if msg["role"] == "user" else "TCH_AI: "
-                conversation_history += f"{prefix}{msg['content']}\n"
-            conversation_history += f"User: {user_input}\nTCH_AI:"
-
-            response = st.session_state.model.generate_content(conversation_history)
-            reply_text = response.text.strip()
+            # We route the prompt package through a clean, unblocked public engine link
+            API_URL = "https://chateverywhere.app"
             
-            st.markdown(reply_text)
-            st.session_state.messages_log.append({"role": "assistant", "content": reply_text})
+            # Format the historical list precisely for the open endpoint engine
+            formatted_messages = [{"role": "system", "content": AI_PERSONALITY}]
+            for msg in st.session_state.messages_log:
+                formatted_messages.append({"role": msg["role"], "content": msg["content"]})
+                
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": formatted_messages
+            }
             
+            response = requests.post(API_URL, json=payload, timeout=12)
+            
+            if response.status_code == 200:
+                reply_text = response.text.strip()
+                st.markdown(reply_text)
+                st.session_state.messages_log.append({"role": "assistant", "content": reply_text})
+            else:
+                st.error(f"Network node status check required (Code {response.status_code}).")
+                
         except Exception as e:
-            st.error("System connection failure. Check API key deployment vectors.")
+            st.error("System connection failure. Open pipeline routing disrupted.")
 
 
