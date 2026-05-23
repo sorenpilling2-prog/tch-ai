@@ -11,7 +11,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # Setup your security key directly in your secure private file
-GOOGLE_API_KEY = "AIzaSyCRSQtzutq-pH68DTqt4xGaFFEcT0j_atM"
+GOOGLE_API_KEY = "AIzaSyDnCuZGUxwLQxtH-TakSgBL38EqFWoNURs"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Your custom developer origin story and friendly personality matrix
@@ -34,7 +34,7 @@ if "chat" not in st.session_state:
 for message in st.session_state.chat.history:
     role_label = "user" if message.role == "user" else "assistant"
     with st.chat_message(role_label):
-        st.markdown(message.parts.text)
+        st.markdown(message.parts[0].text)
 
 # Accept user inputs via the floating text entry field
 if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_box"):
