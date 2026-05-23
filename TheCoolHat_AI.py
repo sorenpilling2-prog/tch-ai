@@ -10,7 +10,7 @@ Original file is located at
 import streamlit as st
 import google.generativeai as genai
 
-# Securely configure your active API key credentials
+# Configure your active API key credentials securely
 GOOGLE_API_KEY = "AIzaSyDnCuZGUxwLQxtH-TakSgBL38EqFWoNURs"
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -25,27 +25,41 @@ st.set_page_config(page_title="TCH_AI Interface", page_icon="🤖")
 st.title("🤖 TCH_AI Workspace")
 st.caption("Synchronized permanent cloud connection pipeline operational.")
 
-# Initialize the chat room cleanly using an isolated session storage string array
-if "chat" not in st.session_state:
-    model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
-    st.session_state.chat = model.start_chat(history=[])
+# Initialize the model engine brain
+if "model" not in st.session_state:
+    st.session_state.model = genai.GenerativeModel('gemini-2.5-flash', system_instruction=AI_PERSONALITY)
 
-# FIXED: Safely loops through text blocks to bypass structural attribute changes
-for message in st.session_state.chat.history:
-    role_label = "user" if message.role == "user" else "assistant"
-    with st.chat_message(role_label):
-        for part in message.parts:
-            st.markdown(part.text)
+# FIXED: We use a standard Python list to store chat history, bypassing the 'RepeatedComposite' bug completely!
+if "messages_log" not in st.session_state:
+    st.session_state.messages_log = []
+
+# Render the historical conversation text blocks onto the web screen layout canvas
+for message in st.session_state.messages_log:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 # Accept user inputs via the terminal input box component
 if user_input := st.chat_input("Transmit message to TCH_AI...", key="tch_chat_box"):
+    # Display and log the user's input
     with st.chat_message("user"):
         st.markdown(user_input)
+    st.session_state.messages_log.append({"role": "user", "content": user_input})
         
+    # Query the Google cloud server and stream the clean text response
     with st.chat_message("assistant"):
         try:
-            response = st.session_state.chat.send_message(user_input)
-            st.markdown(response.text.strip())
+            # We reconstruct the conversation history in a clean text format for the model
+            conversation_history = f"System: {AI_PERSONALITY}\n"
+            for msg in st.session_state.messages_log[:-1]:
+                prefix = "User: " if msg["role"] == "user" else "TCH_AI: "
+                conversation_history += f"{prefix}{msg['content']}\n"
+            conversation_history += f"User: {user_input}\nTCH_AI:"
+
+            response = st.session_state.model.generate_content(conversation_history)
+            reply_text = response.text.strip()
+            
+            st.markdown(reply_text)
+            st.session_state.messages_log.append({"role": "assistant", "content": reply_text})
             
         except Exception as e:
             st.error("System connection failure. Check API key deployment vectors.")
