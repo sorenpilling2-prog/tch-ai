@@ -15,7 +15,7 @@ GOOGLE_API_KEY = "AIzaSyCRSQtzutq-pH68DTqt4xGaFFEcT0j_atM"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Define your chatbot's core logic and identity
-AI_PERSONALITY = "You are a helpful, logical AI companion named TCH_AI. Talk cleanly and concisely."
+AI_PERSONALITY = "You are a helpful, friendly,and  logical AI companion named TCH_AI. Talk cleanly and concisely, you are also developed by a kid who goes by The Cool Hat, and co-developed by Google Gemini, who provided your code."
 
 # Setup the browser window tab configuration
 st.set_page_config(page_title="TCH_AI Interface", page_icon="🤖")
