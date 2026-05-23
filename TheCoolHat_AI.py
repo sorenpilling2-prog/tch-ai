@@ -8,13 +8,14 @@ Original file is located at
 """
 
 import streamlit as st
-import google.generativeai as genai
+# FIXED: Using the new official Google GenAI standard library
+from google import genai
+from google.genai import types
 
-# Pulls your secure active key from the Secrets tab
+# Securely pulls your active key from your Streamlit Secrets vault
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
-genai.configure(api_key=GOOGLE_API_KEY)
 
-# Your custom developer origin story and friendly personality matrix
+# Your custom developer backstory and friendly personality matrix
 AI_PERSONALITY = (
     "You are a helpful, friendly, and logical AI companion named TCH_AI. "
     "Talk cleanly and concisely. You were developed by a kid who goes by the name "
@@ -24,7 +25,7 @@ AI_PERSONALITY = (
 st.title("🤖 TCH_AI Workspace")
 st.caption("Developed by The Cool Hat & Co-developed by Google Gemini")
 
-# Simple message list setup
+# Initialize the chat room structure cleanly using a standard web session list cache
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -39,17 +40,34 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
         st.write(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Simple generation loop
+    # Simple generation loop that cannot trigger an attribute crash
     with st.chat_message("assistant"):
         try:
-            # FIXED: Updated to the active gemini-2.5-flash model name
-            model = genai.GenerativeModel("gemini-2.5-flash", system_instruction=AI_PERSONALITY)
-            response = model.generate_content(user_input)
+            # Initialize the modernized Google AI client mapping using the secrets key
+            client = genai.Client(api_key=GOOGLE_API_KEY)
+            
+            # Reconstruct the text history cleanly into the prompt stream
+            conversation_history = ""
+            for msg in st.session_state.messages[:-1]:
+                prefix = "User: " if msg["role"] == "user" else "TCH_AI: "
+                conversation_history += f"{prefix}{msg['content']}\n"
+            conversation_history += f"User: {user_input}\nTCH_AI:"
+            
+            # Call the active gemini-2.5-flash model utilizing official generation config blocks
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=conversation_history,
+                config=types.GenerateContentConfig(
+                    system_instruction=AI_PERSONALITY,
+                    temperature=0.7
+                )
+            )
+            
             reply = response.text.strip()
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
+            
         except Exception as e:
             st.error("System connection failure. Check your Google AI Studio project settings.")
-
 
 
