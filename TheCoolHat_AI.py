@@ -11,7 +11,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # FIXED: Using your active, secure Gemini key inside your private repository!
-GOOGLE_API_KEY = "AIzaSyDnCuZGUxwLQxtH-TakSgBL38EqFWoNURs"
+GOOGLE_API_KEY = "AIzaSyDQ42ZIKfyXYOxxMSNaiSKhk0Zpq96JI50"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 # Your custom developer origin story and friendly personality matrix
