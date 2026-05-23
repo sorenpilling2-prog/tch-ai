@@ -8,8 +8,10 @@ Original file is located at
 """
 
 import streamlit as st
-from google import genai
-from google.genai import types
+import requests
+
+# Pull the secure Groq key from your secrets locker
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # Your custom developer backstory and friendly personality matrix
 AI_PERSONALITY = (
@@ -21,50 +23,44 @@ AI_PERSONALITY = (
 st.title("🤖 TCH_AI Workspace")
 st.caption("Developed by The Cool Hat & Co-developed by Google Gemini")
 
-# Initialize the chat room structure cleanly using a standard web session list cache
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Print existing messages to the screen
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
 
-# Accept user input text box
 if user_input := st.chat_input("Transmit message to TCH_AI..."):
     with st.chat_message("user"):
         st.write(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Simple generation loop that cannot trigger an attribute crash
     with st.chat_message("assistant"):
         try:
-            # FIXED: Passing your key directly inside the constructor to bypass variable name loops
-            client = genai.Client(api_key=st.secrets["GOOGLE_API_KEY"])
+            # Reconstruct history into an un-gated messaging array
+            history = [{"role": "system", "content": AI_PERSONALITY}]
+            for msg in st.session_state.messages:
+                history.append({"role": msg["role"], "content": msg["content"]})
+                
+            # Connect straight to the open Groq pipeline
+            headers = {
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "model": "llama-3.3-70b-versatile",
+                "messages": history
+            }
             
-            # Reconstruct the text history cleanly into the prompt stream
-            conversation_history = ""
-            for msg in st.session_state.messages[:-1]:
-                prefix = "User: " if msg["role"] == "user" else "TCH_AI: "
-                conversation_history += f"{prefix}{msg['content']}\n"
-            conversation_history += f"User: {user_input}\nTCH_AI:"
+            response = requests.post("https://groq.com", json=payload, headers=headers, timeout=10)
+            reply = response.json()["choices"][0]["message"]["content"].strip()
             
-            # Call the active gemini-2.5-flash model utilizing official generation config blocks
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=conversation_history,
-                config=types.GenerateContentConfig(
-                    system_instruction=AI_PERSONALITY,
-                    temperature=0.7
-                )
-            )
-            
-            reply = response.text.strip()
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
             
         except Exception as e:
-            st.error("System connection failure. Check your Google AI Studio project settings.")
+            st.error("System connection failure. Check your API key deployment vectors.")
+
 
 
 
