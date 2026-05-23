@@ -10,7 +10,7 @@ Original file is located at
 import streamlit as st
 import google.generativeai as genai
 
-# Configure your active API key credentials securely
+# Pulls your secure active key from the Secrets tab
 GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=GOOGLE_API_KEY)
 
@@ -39,11 +39,11 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
         st.write(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Simple generation loop with un-gated model routing
+    # Simple generation loop
     with st.chat_message("assistant"):
         try:
-            # FIXED: Swapped out the restricted model name for the un-gated version
-            model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=AI_PERSONALITY)
+            # FIXED: Updated to the active gemini-2.5-flash model name
+            model = genai.GenerativeModel("gemini-2.5-flash", system_instruction=AI_PERSONALITY)
             response = model.generate_content(user_input)
             reply = response.text.strip()
             st.write(reply)
