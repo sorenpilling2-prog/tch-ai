@@ -12,7 +12,7 @@ import streamlit as st
 from groq import Groq
 
 # Put your free Groq API Key cleanly inside the string below
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "NICE_TRY"
 
 # Your custom developer backstory and friendly personality matrix
 AI_PERSONALITY = (
@@ -43,7 +43,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
     with st.chat_message("assistant"):
         try:
             # Initialize the modernized Groq client engine mapping natively
-            client = Groq(api_key=GROQ_API_KEY)
+            client = Groq(api_key=NICE_TRY)
             
             # Format the historical list precisely for the open endpoint engine array
             formatted_history = [{"role": "system", "content": AI_PERSONALITY}]
