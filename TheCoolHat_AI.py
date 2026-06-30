@@ -41,7 +41,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
             for msg in st.session_state.messages:
                 formatted_history.append({"role": msg["role"], "content": msg["content"]})
                 
-            # FIXED: Updated to use the correct active, free-tier engine path
+            # Call the active Llama 3.3 model layout through the Groq pipeline
             completion = client.chat.completions.create(
                 model="llama-3.3-70b-specdec",
                 messages=formatted_history,
@@ -49,7 +49,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
                 max_tokens=1024,
             )
             
-            # FIXED: Correct structure to access the text response from the Groq SDK
+            # FIXED: Targets choice index [0] to safely read the text response packet 
             reply = completion.choices[0].message.content.strip()
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
