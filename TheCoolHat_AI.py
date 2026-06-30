@@ -49,7 +49,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
                 max_tokens=1024,
             )
             
-            # FIXED: Targets choice index [0] to safely read the text response packet 
+            # FIXED: Correct list index [0] added so the script reads the text packet out of the array
             reply = completion.choices[0].message.content.strip()
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
