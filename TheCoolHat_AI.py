@@ -12,7 +12,7 @@ import streamlit as st
 from groq import Groq
 
 # Put your free Groq API Key cleanly inside the string below
-GROQ_API_KEY = "NICE_TRY"
+GROQ_API_KEY = st.secrets["NICE_TRY"]
 
 # Your custom developer backstory and friendly personality matrix
 AI_PERSONALITY = (
