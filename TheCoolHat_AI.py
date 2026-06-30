@@ -33,7 +33,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
     # Simple generation loop that targets the ultra-fast Groq chips
     with st.chat_message("assistant"):
         try:
-            # FIXED: Passing the correct variable GROQ_API_KEY that holds your secret token
+            # Initialize the modernized Groq client engine mapping natively
             client = Groq(api_key=GROQ_API_KEY)
             
             # Format the historical list precisely for the open endpoint engine array
@@ -41,15 +41,15 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
             for msg in st.session_state.messages:
                 formatted_history.append({"role": msg["role"], "content": msg["content"]})
                 
-            # Call the active DeepSeek-R1 model layout through the Groq pipeline
+            # FIXED: Updated to use the correct active, free-tier engine path
             completion = client.chat.completions.create(
-                model="deepseek-r1-distill-llama-70b",
+                model="llama-3.3-70b-specdec",
                 messages=formatted_history,
                 temperature=0.7,
                 max_tokens=1024,
             )
             
-            # FIXED: Added [0] so the script cleanly reads the text packet out of the choice list array
+            # FIXED: Correct structure to access the text response from the Groq SDK
             reply = completion.choices[0].message.content.strip()
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
