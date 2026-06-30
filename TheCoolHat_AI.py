@@ -52,7 +52,7 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
                 
             # Call the specialized Llama 3 model layout through the Groq pipeline
             completion = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                "model": "llama-3.3-70b-specdec",
                 messages=formatted_history,
                 temperature=0.7,
                 max_tokens=1024,
