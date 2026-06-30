@@ -54,4 +54,5 @@ if user_input := st.chat_input("Transmit message to TCH_AI..."):
             st.write(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
             
-        
+          except Exception as e:
+            st.error("System connection failure. Check your API key deployment vectors.")
